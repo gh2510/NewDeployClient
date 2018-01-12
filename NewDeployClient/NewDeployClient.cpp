@@ -601,20 +601,20 @@ bool find_last_of(char* absfile,char *filepath,int &len)
 				continue;
 			}
 		}
-		printf("the find Index is %d .\n",findindex);
+		//printf("the find Index is %d .\n",findindex);
 		if(findindex == -1)
 			return false;
 		else
 		{
 			if(filepath == NULL)
 			{
-				printf("the filepath is null\n");
+				//printf("the filepath is null\n");
 				filepath = new char[strlen(absfile)];
 				memset(filepath,0,strlen(absfile));
 			}
 			memcpy(filepath,absfile,findindex);
 			
-			printf("the find filepath is %s .\n",filepath);
+			// printf("the find filepath is %s .\n",filepath);
 			
 			return true;
 		}
