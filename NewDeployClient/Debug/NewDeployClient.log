@@ -1,32 +1,33 @@
-﻿生成启动时间为 2018/1/12 10:21:42。
+﻿生成启动时间为 2018/1/26 13:18:52。
      1>项目“D:\项目开发\集成部署\代码\客户端\NewDeployClient\NewDeployClient\NewDeployClient.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
-         正在创建“Debug\NewDeployClient.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+         正在对“Debug\NewDeployClient.unsuccessfulbuild”执行 Touch 任务。
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /Zp1 /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt NewDeployClient.cpp
          NewDeployClient.cpp
      1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\header.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(408): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(309): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(433): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : 参见“strcpy”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(409): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(434): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : 参见“strcat”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(430): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(455): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : 参见“strcpy”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(431): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(456): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : 参见“strcat”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(432): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(457): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : 参见“strcat”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(444): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(469): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : 参见“strcat”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(445): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(470): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : 参见“strcat”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(446): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(471): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : 参见“strcat”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(629): warning C4996: 'mkdir': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _mkdir. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(654): warning C4996: 'mkdir': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _mkdir. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\direct.h(124) : 参见“mkdir”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(667): warning C4996: 'access': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _access. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(692): warning C4996: 'access': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _access. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\io.h(299) : 参见“access”的声明
-     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(828): warning C4996: 'access': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _access. See online help for details.
+     1>d:\项目开发\集成部署\代码\客户端\newdeployclient\newdeployclient\newdeployclient.cpp(853): warning C4996: 'access': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _access. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\io.h(299) : 参见“access”的声明
        ManifestResourceCompile:
          所有输出均为最新。
@@ -47,4 +48,4 @@
 
 生成成功。
 
-已用时间 00:00:03.81
+已用时间 00:00:10.24

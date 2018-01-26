@@ -94,7 +94,7 @@ Stru_Command()
 struct Stru_Scans
 {
 	char scanPath[256];
-	char scanType[10];
+	char scanType[128];
 	char browserID[37];
 	char deviceID[37];
 	char compID[37];

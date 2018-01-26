@@ -28,11 +28,11 @@ void sendHeart()
 	hostInfo.sin_addr.s_addr =  htonl(INADDR_ANY);
 	hostInfo.sin_port = htons( HEARTPORT );
 	
-    if (flag==true && bind( client, (struct sockaddr*) &hostInfo, sizeof(sockaddr_in) ) < 0 )
+    /*if (flag==true && bind( client, (struct sockaddr*) &hostInfo, sizeof(sockaddr_in) ) < 0 )
 	{
 		flag = false;
 		printf( "heartsocket bind failed.\n"  );
-	}
+	}*/
 	Stru_Heart heartbuf;
 	
 	int ret = 0;
@@ -291,19 +291,44 @@ void recvCommand()
 #endif
 }
 
-// 判断文件filename是否为type类型
-bool decFileName(char *fileName,char *type)
+
+// source内容以,分隔，查找innerbuf是否在buffer内容中，如果是返回对应的位置，否则返回-1值
+int findIndex(char *source,char *innerbuf)
 {
-	if(fileName == 0 || type == 0)
+	string buffer(source);
+	// 首先按照,对buffer进行分隔，放到链表当中
+	vector<string> sourcelist;
+	size_t pos = 0, found = 0;
+	while ( found != string::npos )
+	{
+		found = buffer.find(innerbuf, pos);
+		sourcelist.push_back(string(buffer, pos, found - pos));
+		pos = found + 1;
+	}
+	// 分析innerbuf是否在source中
+	for(int i=0;i<sourcelist.size();i++)
+	{
+		if(strcmp(sourcelist[i].c_str(),innerbuf) == 0)
+		{
+			// 找到对应的内容
+			return i+1;
+		}
+	}
+	return -1;
+}
+// 判断文件filename是否为type类型 多个后缀类型以,分隔
+bool decFileName(char *fileName,char *fileType)
+{
+	if(fileName == 0 || fileType == 0)
 		return false;
 	int len = strlen(fileName);
 	for(int i=0;i<len;i++)
 	{
         if(fileName[i] == '.'&&i!=(len-1))
 		{
-			char fileType[40];
-			memcpy(&fileType,&fileName[i+1],len-i+1);
-			if(strcmp(fileType,type) == 0)
+			char type[40];
+			memcpy(&type,&fileName[i+1],len-i+1);
+			if(findIndex(fileType,type) == 0)
 				return true;
 		}
 	}
