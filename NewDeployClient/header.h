@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <direct.h>
+#include <time.h>
+#include <stdlib.h>
  #pragma comment(lib, "ws2_32.lib")
 #endif
 
@@ -25,7 +27,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <dirent.h>  
+#include <dirent.h>
+#include <string.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
@@ -65,7 +69,9 @@ using namespace std;
 #define DEPLOYPORT 3088
 
 
-#define REVBUFSIZE 1024
+#define REVBUFSIZE 12000
+
+#define WRITELOG
 
 // 心跳信息结构体
 struct Stru_Heart
@@ -148,6 +154,9 @@ void intval(int mtime)
 #endif
 #ifdef LINUX
 	sleep(mtime/1000);
+#ifdef DVXWORK
+	sleep(mtime/1000);
+#endif
 #endif
 }
 
@@ -172,5 +181,11 @@ void exitProj();
 char *UnicodeToUTF8(const char* src,int srclen,int &len); // 将UniCode转换为UTF-8编码
 char *UTF8ToUnicode(const char* src,int srclen,int &len); // 将UTF-8转换为UniCode编码
 
+string getTime();
+
+int CreatDir(char *pDir); // 创建本文件夹
+
 bool deployFlag; // 部署标志位
 bool progFlag; // 程序运行标志，true表示正常运行，false表示退出
+
+void writeLog(const char *buf);

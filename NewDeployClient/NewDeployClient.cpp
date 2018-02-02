@@ -6,6 +6,29 @@
 // 保存服务器的IP地址
 char serverIP[15] = "0.0.0.0"; 
 char hostIP[15] = "0.0.0.0"; // 本机IP地址
+
+char filelogName[128]; // 本次启动软件记录日志的名称
+char *LogFloder = (char*)"RGLOGS/"; // 存放日志的路径
+// 记录日志函数
+
+void writeLog(const char *buf)
+{
+#ifdef WRITELOG
+	if(buf != NULL)
+	{
+		CreatDir(LogFloder);
+		FILE *fp = fopen(filelogName,"a+");
+		if(fp == NULL)
+			return;
+		string time = getTime() + "\t";
+		fwrite(time.c_str(),1,time.size(),fp);
+		fwrite(buf,1,strlen(buf),fp);
+		fclose(fp);
+	}
+#endif
+}
+
+
 // 周期发送心跳函数
 void sendHeart()
 {
@@ -20,7 +43,7 @@ void sendHeart()
 	if ( client < 0 )
 	{
 		flag = false;
-		printf( "create heartsocket failed.\n" );
+		writeLog("create heartsocket failed.\n");
 	}
 	sockaddr_in hostInfo;
 	hostInfo.sin_family = AF_INET;
@@ -56,7 +79,7 @@ void sendHeart()
 			ret = sendto(client,(char*)&heartbuf,sizeof(heartbuf),0,(struct sockaddr*)&server,sizeof(struct sockaddr));
 			if(ret == -1)
 			{
-				printf("send heart error\n");
+				writeLog("send heart error.\n");
 			}
 			
 		}
@@ -76,6 +99,7 @@ void sendHeart()
 }
 
 // 将UTF字符集转换为字符串
+#ifdef WIN32
 char* UTF8ToUniCode(const char* utf8,int srclen,int &len)
 {
 	int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, srclen, NULL, 0);
@@ -105,6 +129,7 @@ char* UnicodeToUTF8(const char* src,int srclen,int &len)
 	if(wstr) delete[] wstr;
 	return str; 
 } 
+#endif
 
 // 接收服务器发送的广播信息，获得服务器IP地址
 void RecvServiceBroadcast()
@@ -123,7 +148,7 @@ void RecvServiceBroadcast()
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);  
     if ( sockfd < 0 )
 	{
-		printf( "create serviceBroadcast failed.\n" );
+		writeLog("create serviceBroadcast failed.\n");
 		flag = false;
 	}
     // 接收广播信息
@@ -141,7 +166,7 @@ void RecvServiceBroadcast()
 
     if(flag==true && bind(sockfd, (struct sockaddr*)&saddr, sizeof(saddr)) < 0)
 	{
-		printf( "bind serviceBroadcast failed.\n" );
+		writeLog("bind serviceBroadcast failed.\n");
 		flag = false;
 	}
 #ifdef WIN32
@@ -197,7 +222,7 @@ void recvCommand()
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);  
     if ( sockfd < 0 )
 	{
-		printf( "create serviceBroadcast failed.\n" );
+		writeLog("create serviceBroadcast failed.\n");
 		flag = false;
 	}
 	
@@ -209,7 +234,7 @@ void recvCommand()
 
     if(flag==true && bind(sockfd, (struct sockaddr*)&saddr, sizeof(saddr)) < 0)
 	{
-		printf( "bind serviceBroadcast failed.\n" );
+		writeLog("bind serviceBroadcast failed.\n");
 		flag = false;
 	}
 #ifdef WIN32
@@ -241,9 +266,6 @@ void recvCommand()
 			index += sizeof(scans.deviceID);
 			memcpy(scans.compID,recvline+index,sizeof(scans.compID));
 			index += sizeof(scans.compID);
-            // 设置扫描类型为null，表示为全局扫描
-			memset(scans.scanType,0,sizeof(scans.scanType));
-			index += sizeof(scans.scanType);
             // 获得扫描路径
 			memcpy(scans.scanPath,recvline+index,sizeof(scans.scanPath));
 			scanFilesProxy(scans);
@@ -301,12 +323,12 @@ int findIndex(char *source,char *innerbuf)
 	size_t pos = 0, found = 0;
 	while ( found != string::npos )
 	{
-		found = buffer.find(innerbuf, pos);
+		found = buffer.find(",", pos);
 		sourcelist.push_back(string(buffer, pos, found - pos));
 		pos = found + 1;
 	}
 	// 分析innerbuf是否在source中
-	for(int i=0;i<sourcelist.size();i++)
+	for(int i=0;i<(int)sourcelist.size();i++)
 	{
 		if(strcmp(sourcelist[i].c_str(),innerbuf) == 0)
 		{
@@ -328,7 +350,7 @@ bool decFileName(char *fileName,char *fileType)
 		{
 			char type[40];
 			memcpy(&type,&fileName[i+1],len-i+1);
-			if(findIndex(fileType,type) == 0)
+			if(findIndex(fileType,type) > 0)
 				return true;
 		}
 	}
@@ -349,7 +371,7 @@ void sendScanRets(Stru_ScanRetReco retReco)
 	if ( client < 0 )
 	{
 		flag = false;
-		printf( "create scan failed.\n" );
+		writeLog("create scan failed.\n");
 	}
 	
 	/*
@@ -374,7 +396,7 @@ void sendScanRets(Stru_ScanRetReco retReco)
             server.sin_port = htons(SCANRETS);
             if(connect(client,(struct sockaddr*)&server,sizeof(struct sockaddr)) < 0)
 			{
-				printf("scan connect failed\n");
+				writeLog("scan connect failed\n");
 			}
 			else
 			{
@@ -404,7 +426,7 @@ void sendScanRets(Stru_ScanRetReco retReco)
 				if(ret < 0)
 				{
                     // ret = WSAGetLastError();
-					printf("send scanRet failed\n");
+					writeLog("send scanRet failed.\n");
 				}
 				
 				delete sendbuf;
@@ -438,7 +460,9 @@ void scanFiles(char *scanPath,char *scanType,vector<Stru_ScanRets> &fileList)
     handle = _findfirst(dirNew, &findData);
     if (handle == -1)
     {
-    	printf("open dir %s failed",dirNew);
+		char buffer[40];
+		sprintf(buffer,"open dir %s failed\n",dirNew);
+		writeLog(buffer);
     	return;
     }
         
@@ -493,7 +517,10 @@ void scanFiles(char *scanPath,char *scanType,vector<Stru_ScanRets> &fileList)
 	pDir = opendir (dirNew);		/* Attempt to open directory. */
 	if(pDir == NULL)
 	{
-		printf("open dir %s failed\n",dirNew);
+		char *buffer = new char[40];
+		sprintf(buffer,"open dir %s failed\n",dirNew);
+		writeLog((const char*)buffer);
+		delete buffer;
 		return;
 	}
 	struct dirent *	pDirEnt = NULL;	
@@ -545,7 +572,10 @@ void scanFiles(char *scanPath,char *scanType,vector<Stru_ScanRets> &fileList)
 		pDir = opendir (dirNew);		/* Attempt to open directory. */
 		if(pDir == NULL)
 		{
-			printf("open dir %s failed\n",dirNew);
+			char *buffer = new char[40];
+			sprintf(buffer,"open dir %s failed\n",dirNew);
+			writeLog((const char*)buffer);
+			delete buffer;
 			return;
 		}
 		struct dirent *	pDirEnt = NULL;
@@ -598,6 +628,9 @@ DWORD WINAPI winScanProc(LPVOID para);
 #ifdef LINUX
 void *linuxScanProc(void *argc);
 #endif
+#ifdef DVXWORK
+void vxScanProc(void *argc);
+#endif
 void scanFilesProxy(Stru_Scans scans)
 {
 	Stru_Scans *scanbuf = new Stru_Scans();
@@ -611,7 +644,9 @@ void scanFilesProxy(Stru_Scans scans)
 	pthread_t scanThreadID;
 	pthread_create(&scanThreadID,NULL,linuxScanProc,(void*)scanbuf);
 #endif
-
+#ifdef DVXWORK
+	taskSpawn("scanThread",160,0,6000,(FUNCPTR)vxScanProc,scanbuf,0,0,0,0,0,0,0,0,0);
+#endif
 }
 
 // 获得当前文件的文件路径 返回值  返回参数中文件的路径  其中filepath不含最后的\\信息
@@ -626,20 +661,16 @@ bool find_last_of(char* absfile,char *filepath,int &len)
 				continue;
 			}
 		}
-		//printf("the find Index is %d .\n",findindex);
 		if(findindex == -1)
 			return false;
 		else
 		{
 			if(filepath == NULL)
 			{
-				//printf("the filepath is null\n");
 				filepath = new char[strlen(absfile)];
 				memset(filepath,0,strlen(absfile));
 			}
 			memcpy(filepath,absfile,findindex);
-			
-			// printf("the find filepath is %s .\n",filepath);
 			
 			return true;
 		}
@@ -654,7 +685,7 @@ int my_mkdir(char *pszDir)
     return mkdir(pszDir);
 #endif
 #ifdef LINUX
-    return mkdir(pszDir,S_IRUSR|S_IWUSR|S_IWUSR);
+    return mkdir(pszDir,S_IRUSR|S_IWUSR|S_IXUSR | S_IRWXG | S_IRWXO);
 #endif
 #ifdef DVXWORK
     return mkdir(pszDir);
@@ -679,7 +710,6 @@ int CreatDir(char *pDir)
 		memset(pszDir,0,strlen(pDir)+1);
 		memcpy(pszDir,pDir,strlen(pDir));
 		iLen = strlen(pszDir);
-		// printf("to Create %s path\n",pszDir);
 
         // 遍历依次查找每一级的目录文件
 		for (i = 0;i < iLen;i ++)
@@ -692,17 +722,17 @@ int CreatDir(char *pDir)
 				iRet = access(pszDir,0);
 				if (iRet != 0)
 				{
-					printf("the %s is not exist\n",pszDir);
+					//printf("the %s is not exist\n",pszDir);
                     iRet = my_mkdir(pszDir);
 					if (iRet != 0)
 					{
-						printf("Create %s file is failed\n",pszDir);
+						//printf("Create %s file is failed\n",pszDir);
 						return -1;
 					} 
 				}
 				else
 				{
-					printf("the %s is exist\n",pszDir);
+					//printf("the %s is exist\n",pszDir);
 				}
 				pszDir[i] = '/';
 			} 
@@ -743,7 +773,7 @@ void DeployFiles()
 	server = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP); 
 	if ( server < 0 )
 	{
-		printf( "deploy create socket failed.\n" );
+		writeLog( "deploy create socket failed.\n" );
 		flag = false;
 	}	
 
@@ -752,6 +782,7 @@ void DeployFiles()
 	service.sin_addr.s_addr = htonl(INADDR_ANY);
 	service.sin_port = htons( DEPLOYPORT );
 
+	/* 设置关闭时缓冲处理方式
 	struct linger opt;
 	opt.l_onoff=1;
 	opt.l_linger = 0;
@@ -760,28 +791,31 @@ void DeployFiles()
 		printf( "deploy setLINGER failed.\n" );
 		flag = false;
 	}
+	*/
 
 	int tcp_nodelay = 1;
+	
 	if (setsockopt(server, SOL_SOCKET, SO_KEEPALIVE,(char* ) &tcp_nodelay, sizeof(int)) < 0)
 	{
-		printf("deploy close delay failed\n");
+		writeLog("deploy set alive failed.\n");
 	}
 	if (setsockopt(server, IPPROTO_TCP, TCP_NODELAY,(char* ) &tcp_nodelay, sizeof(int)) < 0)
 	{
-		printf("deploy close delay failed\n");
+		writeLog("deploy set delay failed.\n");
 	}
+	
 
 	if (flag==true&& bind( server, (sockaddr *) &service, sizeof(sockaddr_in) ) < 0 ) {
-		printf( "deploy bind failed.\n" );
+		writeLog( "deploy bind failed.\n" );
 		flag =false;
 		intval(100);
 	}
 
     // 监听 socket
-	int ls = listen( server, 1 );
+	int ls = listen( server, 5 );
 	if(ls == -1)
 	{
-		printf("deploy listen failed.\n");
+		writeLog("deploy listen failed.\n");
 		flag = false;
 	}
 
@@ -821,6 +855,7 @@ void DeployFiles()
 			RecvLen = recvfrom(AcceptSocket, recvbuf, 13, 0,(sockaddr*)&addrSvr, &len); // 其中长度设置为13是解决TCP连包的问题，这里控制只能接收标志信息
             if ( strcmp(recvbuf, "DeployEnd") == 0 ) // 表示本次部署已结束
 			{
+				// writeLog("Deploy End\n");
 				break;
 			}
             // 先接受文件的路径和名称 考虑到编码格式，需要从UTF8转换为多字节
@@ -831,11 +866,24 @@ void DeployFiles()
 			{
 				break;
 			}
+
 			// 转换为UTF-8格式
+#ifdef WIN32
 			char *convertBuf = UTF8ToUniCode(recvbuf1,recvLenTemp,RecvLen);
 			memcpy(recvbuf,convertBuf,RecvLen);
-			recvbuf[RecvLen] = '\0';
 			delete convertBuf;
+#endif
+#ifdef LINUX
+			memcpy(recvbuf,recvbuf1,recvLenTemp);
+			RecvLen = recvLenTemp;
+#endif
+#ifdef DVXWORK
+			memcpy(recvbuf,recvbuf1,recvLenTemp);
+			RecvLen = recvLenTemp;
+#endif
+
+			recvbuf[RecvLen] = '\0';
+
 			switchToLocalSepartorPath(recvbuf);
 			if ( RecvLen < 0 )
 			{
@@ -847,6 +895,7 @@ void DeployFiles()
 			char *filepath = new char[RecvLen];
 			int filepathlen = 0;
 			memset(filepath,0,RecvLen);
+			// printf("%s\n",recvbuf);
 			if(find_last_of(recvbuf,filepath,filepathlen) == true)
 			{
                 // 判断文件夹是否存在，如果不存在泽创建
@@ -863,7 +912,6 @@ void DeployFiles()
 			}
 			else
 			{
-				printf("not find filepath \n");
 				continue;
 			}
 			//delete filepath;
@@ -887,98 +935,16 @@ void DeployFiles()
 				}
 				ofs.write(recvbuf,RecvLen);
 			}
+
 			ofs.close();
 			ofs.clear();
-
+			// 回复收到命令
+			char recvEndFlag[16];
+			memset(recvEndFlag,0,16);
+			strcpy(recvEndFlag,"f");
+			send(AcceptSocket,(const char*)recvEndFlag,strlen(recvEndFlag),0);
             
 		}
-#if 0
-		int fileRecvLen;
-		bool recvFileFlag = false; // 一次接收的标志 
-		char recvbuf[REVBUFSIZE] = ""; // 用于将接收的转换UTF8格式
-		char filepath[256] = "";
-		while(progFlag)
-		{ 
-            if(deployFlag == false) // 暂停本次文件传输
-			{
-				break;
-			}
-			// 判断是否开始接收文件 收到DeployStart表示开始接收，DeployEnd
-            // 先接受文件的路径和名称 考虑到编码格式，需要从UTF8转换为多字节
-			memset( recvbuf, 0, sizeof(recvbuf) );
-			char recvbuf1[REVBUFSIZE] = ""; // 用于接收缓冲
-			int recvLenTemp = recvfrom( AcceptSocket, recvbuf1, REVBUFSIZE, 0,(sockaddr*)&addrSvr, &len );
-			if(recvLenTemp <=0 || recvbuf1 == NULL)
-			{
-				break;
-			}
-			if(recvFileFlag == false) // 表示第一次接收，此时开始为路径
-			{
-				recvFileFlag = true;
-				// 先根据头2字节判断路径的长度，获取路径
-				unsigned short s_pathLen = 0;
-				int i_pathLen = 0;
-				memcpy(&s_pathLen,recvbuf1,2); 
-				if(s_pathLen == 0)
-					break;
-				// 将路径转换为转换为UTF-8格式
-				char *convertBuf = UTF8ToUniCode(recvbuf1+2,s_pathLen,i_pathLen);
-				memcpy(recvbuf,convertBuf,i_pathLen); // 获得文件路径
-				fileRecvLen = recvLenTemp - 2 - i_pathLen; // recvLenTemp剩余的便是文件的数据长度
-				recvbuf[i_pathLen] = '\0';
-				delete convertBuf;
-				switchToLocalSepartorPath(recvbuf); // 统一路径的字符号
-						
-				// 接收到文件后，判断文件夹是否存在，若不存在则创建文件夹
-				//printf("the recv %d buffer \n",bytesRecv);
-				
-				int filepathlen = 0;
-				memset(filepath,0,i_pathLen);
-				if(find_last_of(recvbuf,filepath,filepathlen) == true)
-				{
-					// 判断文件夹是否存在，如果不存在泽创建
-					int iRet = access(filepath,0);  	
-					if (iRet != 0)  
-					{  
-						iRet = CreatDir(filepath);  
-						if (iRet != 0)  
-						{  
-							//printf( "Create filepath %s is failed.Recv is possiable failed\n" ,filepath);
-							continue;
-						}   
-					}  
-				}
-				else
-				{
-					printf("not find filepath \n");
-					continue;
-				}
-
-			}
-			else // 当前接收的全部都是为文件数据
-			{
-				fileRecvLen = recvLenTemp;
-			}
-			// 开始写入文件
-			//printf("start to deploy file\n");
-			std::ofstream ofs;
-            // 打开文件读写
-			ofs.open(recvbuf,ios::binary);
-
-			memset(recvbuf,0,sizeof(recvbuf));
-            memcpy(recvbuf,recvbuf1,fileRecvLen);
-			
-			if (strcmp(recvbuf, "fileRecvEnd")==0)
-			{
-				ofs.close();
-				ofs.clear();
-			}
-			ofs.write(recvbuf,fileRecvLen);
-			
-			recvFileFlag = false; // 本次接收结束
-            
-		}
-#endif 
 		intval(100);
 	}
 #ifdef WIN32
@@ -1097,9 +1063,66 @@ void *linuxScanProc(void *para)
 }
 #endif
 
+#ifdef DVXWORK
+void vxSendHeartProc(void *argc)
+{
+	sendHeart();
+	return 0;
+}
+
+void vxBroadCastProc(void *argc)
+{
+	RecvServiceBroadcast();
+	return 0;
+}
+
+void vxDeployProc(void *argc)
+{
+	DeployFiles();
+	return 0;
+}
+
+void vxrecvComdProc(void *argc)
+{
+	recvCommand();
+	return 0;
+}
+
+void vxScanProc(void *para)
+{
+	Stru_Scans* scans = (Stru_Scans*)para;
+	if(scans == NULL)
+	{
+		pthread_exit(NULL);
+		return 0;
+	}
+	Stru_ScanRetReco scanRetReco;
+    // 开始本地文件的扫描
+	scanFiles(scans->scanPath,scans->scanType,scanRetReco.scanRets);
+	memcpy(scanRetReco.browserID,scans->browserID,sizeof(scans->browserID));
+	memcpy(scanRetReco.deviceID,scans->deviceID,sizeof(scans->deviceID));
+	memcpy(scanRetReco.compID,scans->compID,sizeof(scans->compID));
+	delete scans;
+    // 将扫描结果发送
+	scanRetReco.fileNum = scanRetReco.scanRets.size();
+	sendScanRets(scanRetReco);
+	scanRetReco.scanRets.clear();
+	return 0;
+}
+#endif
 void exitProj()
 {
 	progFlag = false;
+}
+
+// 返回系统时间的名称
+string getTime()
+{
+     time_t timep;
+     time (&timep);
+     char tmp[64];
+     strftime(tmp, sizeof(tmp), "%Y-%m-%d %H-%M-%S",localtime(&timep) );
+     return tmp;
 }
 
 int main(int argc, char* argv[])
@@ -1109,6 +1132,9 @@ int main(int argc, char* argv[])
     WSAStartup(MAKEWORD(2,2),&wsa); //initial Ws2_32.dll by a process
 	
 #endif
+	// 记录日志的名称
+	string logName = string(LogFloder) + "log-" + getTime() + ".txt";
+	strcpy(filelogName,logName.c_str());
 	progFlag = true;
 	deployFlag = true; 
 	char hostName[255];
@@ -1153,13 +1179,17 @@ int main(int argc, char* argv[])
 	{
 		pthread_join(deployThreadID,NULL);
 	}
-	if(comdID != 0)
+	if(comdID !=0)
 	{
 		pthread_join(deployThreadID,NULL);
 	}*/
 #endif
-
-
+#ifdef DVXWORK
+	taskSpawn("broadcastThread",130,0,2000,(FUNCPTR)vxBroadCastProc,0,0,0,0,0,0,0,0,0,0); // 启动发送心跳线程
+	taskSpawn("heartdwThread",160,0,2000,(FUNCPTR)vxSendHeartProc,0,0,0,0,0,0,0,0,0,0); // 启动接收广播线程
+	taskSpawn("deployThread",120,0,8000,(FUNCPTR)vxDeployProc,0,0,0,0,0,0,0,0,0,0); // 启动接收文件部署线程
+	taskSpawn("recvComd",110,0,2000,(FUNCPTR)vxrecvComdProc,0,0,0,0,0,0,0,0,0,0); // 启动接收命令线程
+#endif
 	return 0;
 }
 
