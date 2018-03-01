@@ -1,0 +1,6 @@
+2018-02-26 16-21-47	open dir D:/xy//*.* failed
+2018-02-26 16-25-46	open dir D:/xy//*.* failed
+2018-02-26 16-35-37	open dir D:/xy//*.* failed
+2018-02-26 16-44-41	open dir D:/xy//*.* failed
+2018-02-26 16-44-42	open dir D:/xy//*.* failed
+2018-02-26 16-44-52	open dir D:/xy//*.* failed

@@ -1,0 +1,2 @@
+2018-02-26 16-51-13	open dir D:/xy//*.* failed
+2018-02-26 16-51-18	open dir D:/xy//*.* failed

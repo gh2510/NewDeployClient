@@ -755,6 +755,21 @@ void switchToLocalSepartorPath(char * pDir)
     }
 }
 
+/*
+	回复接收部署的装备
+	c:表示状态标识 1表示文件部署完成 1表示找到部署路径，继续部署文件
+*/
+void sendDeployState(int AcceptSocket,int c)
+{
+	char recvEndFlag[16];
+	memset(recvEndFlag,0,16);
+	if(c == 1)
+		strcpy(recvEndFlag,"f");
+	else if(c == 2)
+		strcpy(recvEndFlag,"r");
+	send(AcceptSocket,(const char*)recvEndFlag,strlen(recvEndFlag),0);
+}
+
 // 接收服务器的部署文件消息并生成本地文件
 void DeployFiles()
 {
@@ -905,15 +920,19 @@ void DeployFiles()
 					iRet = CreatDir(filepath);  
 					if (iRet != 0)  
 					{  
-						//printf( "Create filepath %s is failed.Recv is possiable failed\n" ,filepath);
+						// 结束本次部署
 						continue;
 					}   
 				}  
 			}
 			else
 			{
+				// 结束本次部署
 				continue;
 			}
+			// 通知服务器继续部署
+			intval(400);
+			sendDeployState(AcceptSocket,2);
 			//delete filepath;
 			//printf("start to deploy file\n");
 			std::ofstream ofs;
@@ -939,10 +958,8 @@ void DeployFiles()
 			ofs.close();
 			ofs.clear();
 			// 回复收到命令
-			char recvEndFlag[16];
-			memset(recvEndFlag,0,16);
-			strcpy(recvEndFlag,"f");
-			send(AcceptSocket,(const char*)recvEndFlag,strlen(recvEndFlag),0);
+			intval(400);
+			sendDeployState(AcceptSocket,1);
             
 		}
 		intval(100);
